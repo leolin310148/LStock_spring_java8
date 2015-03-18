@@ -2,7 +2,7 @@ package me.leolin.model.holder.stock;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import me.leolin.model.dto.stock.RemoteStockPriceDto;
+import me.leolin.model.entity.StockPriceEntity;
 
 import java.util.List;
 
@@ -12,13 +12,13 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RemoteStockPriceHolder {
     @JsonProperty("msgArray")
-    private List<RemoteStockPriceDto> stockPrices;
+    private List<StockPriceEntity> stockPrices;
 
-    public List<RemoteStockPriceDto> getStockPrices() {
+    public List<StockPriceEntity> getStockPrices() {
         return stockPrices;
     }
 
-    public void setStockPrices(List<RemoteStockPriceDto> stockPrices) {
+    public void setStockPrices(List<StockPriceEntity> stockPrices) {
         this.stockPrices = stockPrices;
     }
 }

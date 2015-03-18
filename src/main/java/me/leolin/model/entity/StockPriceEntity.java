@@ -1,58 +1,65 @@
-package me.leolin.model.dto.stock;
+package me.leolin.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author leolin
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RemoteStockPriceDto {
-
-    @JsonProperty("ex")
-    private String ex;
+@Entity
+public class StockPriceEntity implements Serializable {
     @JsonProperty("ch")
+    @Id
     private String id;
+    @Column
     @JsonProperty("tv")
     private String lastTradeCount;
+    @Column
     @JsonProperty("v")
     private String totalTradeCount;
+    @Column
     @JsonProperty("tlong")
     private Date lastTradeDate;
+    @Column
     @JsonProperty("f")
     private String waitForSaleCounts;
+    @Column
     @JsonProperty("a")
     private String waitForSalePrices;
+    @Column
     @JsonProperty("g")
     private String waitForBuyCounts;
+    @Column
     @JsonProperty("b")
     private String waitForBuyPrices;
+    @Column
     @JsonProperty("o")
     private String openPrice;
+    @Column
     @JsonProperty("l")
     private String lowPrice;
+    @Column
     @JsonProperty("h")
     private String highPrice;
+    @Column
     @JsonProperty("u")
     private String lowestPrice;
+    @Column
     @JsonProperty("w")
     private String highestPrice;
+    @Column
     @JsonProperty("z")
     private String lastPrice;
+    @Column
     @JsonProperty("y")
     private String yesterdayPrice;
-
-
-    public String getEx() {
-        return ex;
-    }
-
-    public void setEx(String ex) {
-        this.ex = ex;
-    }
 
     public String getId() {
         return id;
@@ -172,10 +179,5 @@ public class RemoteStockPriceDto {
 
     public void setYesterdayPrice(String yesterdayPrice) {
         this.yesterdayPrice = yesterdayPrice;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
     }
 }

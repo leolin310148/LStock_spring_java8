@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.leolin.Config;
 import me.leolin.dao.OtcIndustryDao;
 import me.leolin.dao.StockDao;
+import me.leolin.dao.StockPriceDao;
 import me.leolin.dao.TseIndustryDao;
 import me.leolin.model.dto.stock.IndustryDto;
-import me.leolin.model.dto.stock.RemoteStockPriceDto;
 import me.leolin.model.dto.stock.StockDto;
 import me.leolin.model.entity.OtcIndustryEntity;
 import me.leolin.model.entity.StockEntity;
+import me.leolin.model.entity.StockPriceEntity;
 import me.leolin.model.entity.TseIndustryEntity;
 import me.leolin.model.holder.stock.RemoteStockPriceHolder;
 import org.slf4j.Logger;
@@ -57,6 +58,8 @@ public class StockService {
     private OtcIndustryDao otcIndustryDao;
     @Autowired
     private StockDao stockDao;
+    @Autowired
+    private StockPriceDao stockPriceDao;
 
 
     private void syncStocksInIndustry(String marketCode, String industryCode) {
@@ -67,7 +70,7 @@ public class StockService {
             stockDao.save(
                     list.stream()
                             .map(m -> new StockEntity(m.get(KEY_STOCK_ID), m.get(KEY_EX), m.get(KEY_STOCK_FULL_NAME), m.get(KEY_STOCK_NAME), industryCode))
-                            .filter(stockEntity -> filterStockEntity(stockEntity))
+                            .filter(this::filterStockEntity)
                             .collect(toList()));
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
@@ -145,15 +148,28 @@ public class StockService {
                             ));
                     if (!queryString.isEmpty()) {
                         Async.start(() -> getRemoteStockPrice(queryString), io())
-                                .subscribe(dtos -> dtos.forEach(dto -> System.out.println(dto)));
-
+                                .subscribe(stockPriceDao::save);
+                    }
+                }
+        );
+        otcIndustryDao.getAllIndustryCodes().forEach(code -> {
+                    String queryString = String
+                            .join("|", (
+                                    stockDao.findByMarketAndIndustry(KEY_OTC, code)
+                                            .stream()
+                                            .map(e -> KEY_OTC + "_" + e.getId())
+                                            .collect(toList())
+                            ));
+                    if (!queryString.isEmpty()) {
+                        Async.start(() -> getRemoteStockPrice(queryString), io())
+                                .subscribe(stockPriceDao::save);
                     }
                 }
         );
     }
 
 
-    private List<RemoteStockPriceDto> getRemoteStockPrice(String queryString) {
+    private List<StockPriceEntity> getRemoteStockPrice(String queryString) {
         String url = String.format(Config.URL_GET_STOCK_PIRCE, queryString);
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         try {
