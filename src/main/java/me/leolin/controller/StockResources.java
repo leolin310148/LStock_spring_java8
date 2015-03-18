@@ -1,7 +1,7 @@
 package me.leolin.controller;
 
 import me.leolin.model.holder.common.DefaultResultHolder;
-import me.leolin.service.StockService;
+import me.leolin.business.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +25,7 @@ public class StockResources {
             @PathVariable("marketCode") String marketCode,
             @PathVariable("industryCode") String industryCode
     ) {
-        return new DefaultResultHolder(stockService.getStocks(marketCode, industryCode));
+        return new DefaultResultHolder(stockService.getStockByMarkeyAndIndustry(marketCode, industryCode));
     }
 
     @RequestMapping(value = "/industry", method = RequestMethod.GET)
