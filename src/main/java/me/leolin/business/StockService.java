@@ -138,6 +138,7 @@ public class StockService {
 //    @Scheduled(cron = "0/20 0-35 13 * MON-FRI ?")
     @Scheduled(fixedRate = 60000, initialDelay = 5000)
     public void syncStockPrice() {
+        LOGGER.info("Start get price");
         tseIndustryDao.getAllIndustryCodes().forEach(code -> {
                     String queryString = String
                             .join("|", (
@@ -162,7 +163,10 @@ public class StockService {
                             ));
                     if (!queryString.isEmpty()) {
                         Async.start(() -> getRemoteStockPrice(queryString), io())
-                                .subscribe(stockPriceDao::save);
+                                .subscribe(stockPriceEntities -> {
+                                    stockPriceDao.save(stockPriceEntities);
+                                    LOGGER.info("Successfully save {} price entities", stockPriceEntities.size());
+                                });
                     }
                 }
         );
@@ -174,7 +178,9 @@ public class StockService {
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         try {
             RemoteStockPriceHolder holder = objectMapper.readValue(responseEntity.getBody(), RemoteStockPriceHolder.class);
-            return holder.getStockPrices();
+            List<StockPriceEntity> prices = holder.getStockPrices();
+            LOGGER.info("Successfully get {} stock price", prices.size());
+            return prices;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             return new ArrayList<>(0);
