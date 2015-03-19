@@ -1,13 +1,15 @@
-package me.leolin.business;
+package me.leolin.business.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.leolin.Config;
+import me.leolin.business.transformer.StockTransformer;
 import me.leolin.dao.OtcIndustryDao;
 import me.leolin.dao.StockDao;
 import me.leolin.dao.StockPriceDao;
 import me.leolin.dao.TseIndustryDao;
 import me.leolin.model.dto.stock.IndustryDto;
 import me.leolin.model.dto.stock.StockDto;
+import me.leolin.model.dto.stock.StockPriceDto;
 import me.leolin.model.entity.OtcIndustryEntity;
 import me.leolin.model.entity.StockEntity;
 import me.leolin.model.entity.StockPriceEntity;
@@ -134,11 +136,11 @@ public class StockService {
         }
     }
 
-    //    @Scheduled(cron = "0/20 0 9-12 * MON-FRI ?")
-//    @Scheduled(cron = "0/20 0-35 13 * MON-FRI ?")
-    @Scheduled(fixedRate = 60000, initialDelay = 5000)
+    @Scheduled(cron = "0/5 0/1 9-13 * * ?")
+//    @Scheduled(cron = "0/5 0-35/1 13 ? * MON-FRI")
+//    @Scheduled(fixedRate = 60000, initialDelay = 5000)
     public void syncStockPrice() {
-        LOGGER.info("Start get price");
+        LOGGER.debug("Start get price");
         tseIndustryDao.getAllIndustryCodes().forEach(code -> {
                     String queryString = String
                             .join("|", (
@@ -165,7 +167,7 @@ public class StockService {
                         Async.start(() -> getRemoteStockPrice(queryString), io())
                                 .subscribe(stockPriceEntities -> {
                                     stockPriceDao.save(stockPriceEntities);
-                                    LOGGER.info("Successfully save {} price entities", stockPriceEntities.size());
+                                    LOGGER.debug("Successfully save {} price entities", stockPriceEntities.size());
                                 });
                     }
                 }
@@ -179,11 +181,24 @@ public class StockService {
         try {
             RemoteStockPriceHolder holder = objectMapper.readValue(responseEntity.getBody(), RemoteStockPriceHolder.class);
             List<StockPriceEntity> prices = holder.getStockPrices();
-            LOGGER.info("Successfully get {} stock price", prices.size());
+            LOGGER.debug("Successfully get {} stock price", prices.size());
             return prices;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             return new ArrayList<>(0);
         }
     }
+
+    public List<StockPriceDto> getStockPriceInfos(List<String> stockIds) {
+        stockIds = stockIds.stream().map(this::checkStockId).collect(toList());
+        return stockPriceDao.findAll(stockIds).stream().map(StockTransformer::priceEntityToDto).collect(toList());
+    }
+
+    private String checkStockId(String id) {
+        if (!id.contains(".tw")) {
+            return id + ".tw";
+        }
+        return id;
+    }
+
 }

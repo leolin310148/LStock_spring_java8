@@ -29,10 +29,10 @@ public class StockPriceEntity implements Serializable {
     private Date lastTradeDate;
     @Column
     @JsonProperty("f")
-    private String waitForSaleCounts;
+    private String waitForSellCounts;
     @Column
     @JsonProperty("a")
-    private String waitForSalePrices;
+    private String waitForSellPrices;
     @Column
     @JsonProperty("g")
     private String waitForBuyCounts;
@@ -93,20 +93,20 @@ public class StockPriceEntity implements Serializable {
         this.lastTradeDate = lastTradeDate;
     }
 
-    public String getWaitForSaleCounts() {
-        return waitForSaleCounts;
+    public String getWaitForSellCounts() {
+        return waitForSellCounts;
     }
 
-    public void setWaitForSaleCounts(String waitForSaleCounts) {
-        this.waitForSaleCounts = waitForSaleCounts;
+    public void setWaitForSellCounts(String waitForSellCounts) {
+        this.waitForSellCounts = waitForSellCounts;
     }
 
-    public String getWaitForSalePrices() {
-        return waitForSalePrices;
+    public String getWaitForSellPrices() {
+        return waitForSellPrices;
     }
 
-    public void setWaitForSalePrices(String waitForSalePrices) {
-        this.waitForSalePrices = waitForSalePrices;
+    public void setWaitForSellPrices(String waitForSellPrices) {
+        this.waitForSellPrices = waitForSellPrices;
     }
 
     public String getWaitForBuyCounts() {

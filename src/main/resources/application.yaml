@@ -12,3 +12,6 @@ spring:
         ddl-auto: update
         dialect: org.hibernate.dialect.MySQL5Dialect
         naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+  view:
+    prefix: /WEB-INF/jsp/
+    suffix: .jsp

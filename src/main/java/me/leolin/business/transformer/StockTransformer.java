@@ -1,7 +1,97 @@
 package me.leolin.business.transformer;
 
+import me.leolin.model.dto.stock.PriceInfoDto;
+import me.leolin.model.dto.stock.StockPriceDto;
+import me.leolin.model.entity.StockPriceEntity;
+
+import java.text.NumberFormat;
+import java.util.Optional;
+
+import static org.apache.commons.lang3.math.NumberUtils.toDouble;
+import static org.apache.commons.lang3.math.NumberUtils.toInt;
+
 /**
  * @author leolin
  */
 public class StockTransformer {
+    private static final NumberFormat numberFormat = NumberFormat.getInstance();
+    public static final String COLOR_YELLOW = "y";
+    private static final String COLOR_GREEN = "g";
+    private static final String COLOR_RED = "r";
+
+    static {
+        numberFormat.setMinimumFractionDigits(2);
+    }
+
+    public static StockPriceDto priceEntityToDto(StockPriceEntity entity) {
+        StockPriceDto dto = new StockPriceDto();
+        dto.setId(entity.getId());
+
+        double yesterdayPrice = toDouble(entity.getYesterdayPrice());
+        dto.setYesterdayPrice(yesterdayPrice);
+        dto.setTotalCount(toInt(entity.getTotalTradeCount(), 0));
+
+        //漲跌
+        double lastPrice = toDouble(entity.getLastPrice(), yesterdayPrice);
+        String range = numberFormat.format((lastPrice - yesterdayPrice) * 100 / yesterdayPrice) + "%";
+        dto.setRange(range);
+
+        //成交價 成交量
+        PriceInfoDto lastPriceInfoDto = new PriceInfoDto();
+        lastPriceInfoDto.setPrice(Optional.ofNullable(entity.getLastPrice()).orElse("-"));
+        lastPriceInfoDto.setCount(entity.getLastTradeCount());
+        if (range.equals("0.00")) {
+            lastPriceInfoDto.setColor(COLOR_YELLOW);
+        } else if (range.startsWith("-")) {
+            lastPriceInfoDto.setColor(COLOR_GREEN);
+        } else {
+            lastPriceInfoDto.setColor(COLOR_RED);
+        }
+        dto.setLastPrice(lastPriceInfoDto);
+
+
+        //開盤價
+        dto.setOpenPrice(getPriceInfo(yesterdayPrice, entity.getOpenPrice()));
+        //最高價
+        dto.setHighPrice(getPriceInfo(yesterdayPrice, entity.getHighPrice()));
+        //最低價
+        dto.setLowPrice(getPriceInfo(yesterdayPrice, entity.getLowPrice()));
+
+
+        String waitForBuyCounts = entity.getWaitForBuyCounts();
+        if (!"-".equals(waitForBuyCounts)) {
+            String[] wfbcs = waitForBuyCounts.split("_");
+            String[] wfbps = entity.getWaitForBuyPrices().split("_");
+            for (int i = 0; i < wfbcs.length; i++) {
+                PriceInfoDto priceInfo = getPriceInfo(yesterdayPrice, wfbps[i]);
+                priceInfo.setCount(wfbcs[i]);
+                dto.getBuyRows().add(priceInfo);
+            }
+        }
+        String waitForSellCounts = entity.getWaitForSellCounts();
+        if (!"-".equals(waitForSellCounts)) {
+            String[] wfscs = waitForSellCounts.split("_");
+            String[] wfsps = entity.getWaitForSellPrices().split("_");
+            for (int i = 0; i < wfscs.length; i++) {
+                PriceInfoDto priceInfo = getPriceInfo(yesterdayPrice, wfsps[i]);
+                priceInfo.setCount(wfscs[i]);
+                dto.getSellRows().add(priceInfo);
+            }
+        }
+
+        return dto;
+
+    }
+
+    private static PriceInfoDto getPriceInfo(double yesterdayPrice, String targetPrice) {
+        PriceInfoDto openPriceInfoDto = new PriceInfoDto();
+        Optional<String> optionalPrice = Optional.ofNullable(targetPrice);
+        openPriceInfoDto.setPrice(optionalPrice.orElse("-"));
+        if (optionalPrice.isPresent()) {
+            openPriceInfoDto.setColor(toDouble(optionalPrice.get()) - yesterdayPrice > 0 ? COLOR_RED : COLOR_GREEN);
+        } else {
+            openPriceInfoDto.setColor(COLOR_YELLOW);
+        }
+        return openPriceInfoDto;
+    }
 }
