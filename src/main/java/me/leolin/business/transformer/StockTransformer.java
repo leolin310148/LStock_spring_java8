@@ -1,7 +1,9 @@
 package me.leolin.business.transformer;
 
 import me.leolin.model.dto.stock.PriceInfoDto;
+import me.leolin.model.dto.stock.StockDto;
 import me.leolin.model.dto.stock.StockPriceDto;
+import me.leolin.model.entity.StockEntity;
 import me.leolin.model.entity.StockPriceEntity;
 
 import java.text.NumberFormat;
@@ -22,6 +24,11 @@ public class StockTransformer {
     static {
         numberFormat.setMinimumFractionDigits(2);
     }
+
+    public static StockDto mapStockEntityToDto(StockEntity e) {
+        return new StockDto(e.getId(), e.getName());
+    }
+
 
     public static StockPriceDto priceEntityToDto(StockPriceEntity entity) {
         StockPriceDto dto = new StockPriceDto();
@@ -92,6 +99,7 @@ public class StockTransformer {
         } else {
             openPriceInfoDto.setColor(COLOR_YELLOW);
         }
+
         return openPriceInfoDto;
     }
 }

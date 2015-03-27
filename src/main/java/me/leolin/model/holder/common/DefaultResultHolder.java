@@ -24,6 +24,11 @@ public class DefaultResultHolder {
         this.success = success;
     }
 
+    public DefaultResultHolder(boolean success, String reason) {
+        this.success = success;
+        msgs.add(reason);
+    }
+
     public boolean isSuccess() {
         return success;
     }

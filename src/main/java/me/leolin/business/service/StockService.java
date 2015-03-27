@@ -18,6 +18,7 @@ import me.leolin.model.holder.stock.RemoteStockPriceHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,9 @@ public class StockService {
     private boolean filterStockEntity(StockEntity stockEntity) {
 
         try {
-            Integer.parseInt(stockEntity.getId().split("\\.")[0]);
+            String id = stockEntity.getId();
+
+            Integer.parseInt(id.split("\\.")[0]);
             String fullName = stockEntity.getFullName();
             if (fullName.contains("美購") || fullName.contains("歐購") || fullName.contains("公司債")) {
                 return false;
@@ -94,15 +97,35 @@ public class StockService {
     }
 
     public List<IndustryDto> getAllTseIndustry() {
-        return tseIndustryDao.findAll().stream().map(e -> new IndustryDto(e.getCode(), e.getName())).collect(toList());
+        return tseIndustryDao
+                .findAll()
+                .stream()
+                .map(e -> new IndustryDto(e.getCode(), e.getName()))
+                .collect(toList());
     }
 
     public List<IndustryDto> getAllOtcIndustry() {
-        return otcIndustryDao.findAll().stream().map(e -> new IndustryDto(e.getCode(), e.getName())).collect(toList());
+        return otcIndustryDao
+                .findAll()
+                .stream()
+                .map(e -> new IndustryDto(e.getCode(), e.getName()))
+                .collect(toList());
     }
 
-    public List<StockDto> getStockByMarkeyAndIndustry(String marketCode, String industryCode) {
-        return stockDao.findByMarketAndIndustry(marketCode, industryCode).stream().map(e -> new StockDto(e.getId(), e.getName(), e.getFullName())).collect(toList());
+    public List<StockDto> getStockByMarketAndIndustry(String marketCode, String industryCode) {
+        return stockDao
+                .findByMarketAndIndustry(marketCode, industryCode)
+                .stream()
+                .map(StockTransformer::mapStockEntityToDto)
+                .collect(toList());
+    }
+
+    public List<StockDto> findLike(String searchText) {
+        return stockDao
+                .findLike(searchText, new PageRequest(0, 10))
+                .stream()
+                .map(StockTransformer::mapStockEntityToDto)
+                .collect(toList());
     }
 
 
@@ -142,8 +165,8 @@ public class StockService {
     public void syncStockPrice() {
         LOGGER.debug("Start get price");
         tseIndustryDao.getAllIndustryCodes().forEach(code -> {
-                    String queryString = String
-                            .join("|", (
+                    String queryString = String.join
+                            ("|", (
                                     stockDao.findByMarketAndIndustry(KEY_TSE, code)
                                             .stream()
                                             .map(e -> KEY_TSE + "_" + e.getId())
@@ -156,8 +179,8 @@ public class StockService {
                 }
         );
         otcIndustryDao.getAllIndustryCodes().forEach(code -> {
-                    String queryString = String
-                            .join("|", (
+                    String queryString = String.join(
+                            "|", (
                                     stockDao.findByMarketAndIndustry(KEY_OTC, code)
                                             .stream()
                                             .map(e -> KEY_OTC + "_" + e.getId())
@@ -190,8 +213,15 @@ public class StockService {
     }
 
     public List<StockPriceDto> getStockPriceInfos(List<String> stockIds) {
-        stockIds = stockIds.stream().map(this::checkStockId).collect(toList());
-        return stockPriceDao.findAll(stockIds).stream().map(StockTransformer::priceEntityToDto).collect(toList());
+        return stockPriceDao
+                .findAll(
+                        stockIds.stream()
+                                .map(this::checkStockId)
+                                .collect(toList())
+                )
+                .stream()
+                .map(StockTransformer::priceEntityToDto)
+                .collect(toList());
     }
 
     private String checkStockId(String id) {

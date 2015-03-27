@@ -1,0 +1,11 @@
+{
+  "name": "LStock2015",
+  "dependencies": {
+    "angular": "~1.3.0",
+    "angular-resource": "~1.3.0",
+    "angular-route": "~1.3.0",
+    "bootstrap-css-only": "~3.3.4",
+    "lodash" : "3.5.0",
+    "angular-bootstrap":"0.12.1"
+  }
+}
