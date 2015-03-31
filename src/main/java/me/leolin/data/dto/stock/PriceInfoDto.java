@@ -1,4 +1,4 @@
-package me.leolin.model.dto.stock;
+package me.leolin.data.dto.stock;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.builder.ToStringBuilder;

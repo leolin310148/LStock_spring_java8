@@ -1,4 +1,4 @@
-package me.leolin.model.holder.common;
+package me.leolin.data.holder.common;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

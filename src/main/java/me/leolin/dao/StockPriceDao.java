@@ -1,6 +1,6 @@
 package me.leolin.dao;
 
-import me.leolin.model.entity.StockPriceEntity;
+import me.leolin.data.entity.StockPriceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

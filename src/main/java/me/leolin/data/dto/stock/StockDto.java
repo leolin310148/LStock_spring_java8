@@ -1,4 +1,4 @@
-package me.leolin.model.dto.stock;
+package me.leolin.data.dto.stock;
 
 /**
  * @author leolin

@@ -1,10 +1,10 @@
 package me.leolin.business.transformer;
 
-import me.leolin.model.dto.stock.PriceInfoDto;
-import me.leolin.model.dto.stock.StockDto;
-import me.leolin.model.dto.stock.StockPriceDto;
-import me.leolin.model.entity.StockEntity;
-import me.leolin.model.entity.StockPriceEntity;
+import me.leolin.data.dto.stock.PriceInfoDto;
+import me.leolin.data.dto.stock.StockDto;
+import me.leolin.data.dto.stock.StockPriceDto;
+import me.leolin.data.entity.StockEntity;
+import me.leolin.data.entity.StockPriceEntity;
 
 import java.text.NumberFormat;
 import java.util.Optional;

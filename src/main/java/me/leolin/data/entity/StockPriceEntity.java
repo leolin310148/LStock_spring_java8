@@ -1,4 +1,4 @@
-package me.leolin.model.entity;
+package me.leolin.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

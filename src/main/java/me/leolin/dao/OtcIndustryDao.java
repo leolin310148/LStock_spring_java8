@@ -1,6 +1,6 @@
 package me.leolin.dao;
 
-import me.leolin.model.entity.OtcIndustryEntity;
+import me.leolin.data.entity.OtcIndustryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

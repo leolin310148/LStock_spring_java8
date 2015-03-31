@@ -1,4 +1,4 @@
-package me.leolin.model.entity;
+package me.leolin.data.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

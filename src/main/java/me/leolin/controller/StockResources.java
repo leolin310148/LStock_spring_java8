@@ -1,7 +1,7 @@
 package me.leolin.controller;
 
 import me.leolin.business.service.StockService;
-import me.leolin.model.holder.common.DefaultResultHolder;
+import me.leolin.data.holder.common.DefaultResultHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

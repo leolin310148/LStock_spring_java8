@@ -1,7 +1,6 @@
 package me.leolin.dao;
 
-import me.leolin.model.entity.StockEntity;
-import org.springframework.data.domain.PageRequest;
+import me.leolin.data.entity.StockEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

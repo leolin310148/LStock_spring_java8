@@ -1,8 +1,8 @@
-package me.leolin.model.holder.stock;
+package me.leolin.data.holder.stock;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import me.leolin.model.entity.StockPriceEntity;
+import me.leolin.data.entity.StockPriceEntity;
 
 import java.util.List;
 

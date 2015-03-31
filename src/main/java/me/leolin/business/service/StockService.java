@@ -7,14 +7,14 @@ import me.leolin.dao.OtcIndustryDao;
 import me.leolin.dao.StockDao;
 import me.leolin.dao.StockPriceDao;
 import me.leolin.dao.TseIndustryDao;
-import me.leolin.model.dto.stock.IndustryDto;
-import me.leolin.model.dto.stock.StockDto;
-import me.leolin.model.dto.stock.StockPriceDto;
-import me.leolin.model.entity.OtcIndustryEntity;
-import me.leolin.model.entity.StockEntity;
-import me.leolin.model.entity.StockPriceEntity;
-import me.leolin.model.entity.TseIndustryEntity;
-import me.leolin.model.holder.stock.RemoteStockPriceHolder;
+import me.leolin.data.dto.stock.IndustryDto;
+import me.leolin.data.dto.stock.StockDto;
+import me.leolin.data.dto.stock.StockPriceDto;
+import me.leolin.data.entity.OtcIndustryEntity;
+import me.leolin.data.entity.StockEntity;
+import me.leolin.data.entity.StockPriceEntity;
+import me.leolin.data.entity.TseIndustryEntity;
+import me.leolin.data.holder.stock.RemoteStockPriceHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +131,7 @@ public class StockService {
 
     @Scheduled(cron = "0 0 1 * * ?")
     @Transactional
+    @org.springframework.scheduling.annotation.Async
     public void syncStocks() {
         try {
             tseIndustryDao.deleteAllInBatch();
