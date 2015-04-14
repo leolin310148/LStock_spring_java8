@@ -20,7 +20,7 @@ public class SubscribeGroupEntity implements Serializable {
     @Column
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "group")
     private List<SubscribeStockEntity> subscribeStocks;
 
     public Long getId() {

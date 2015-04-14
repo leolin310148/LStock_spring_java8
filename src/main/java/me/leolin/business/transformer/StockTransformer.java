@@ -5,9 +5,13 @@ import me.leolin.data.dto.stock.StockDto;
 import me.leolin.data.dto.stock.StockPriceDto;
 import me.leolin.data.entity.StockEntity;
 import me.leolin.data.entity.StockPriceEntity;
+import me.leolin.data.entity.StockTodayPriceEntity;
+import me.leolin.data.entity.StockTodayPriceId;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.math.NumberUtils.toDouble;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
@@ -101,5 +105,24 @@ public class StockTransformer {
         }
 
         return openPriceInfoDto;
+    }
+
+
+    public static List<StockTodayPriceEntity> mapStockPriceToStockTodayPrice(List<StockPriceEntity> entities) {
+        return entities.stream().map(StockTransformer::mapStockPriceToStockTodayPrice).collect(Collectors.toList());
+    }
+
+    private static StockTodayPriceEntity mapStockPriceToStockTodayPrice(StockPriceEntity entity) {
+        StockTodayPriceEntity tpe = new StockTodayPriceEntity();
+        StockTodayPriceId id = new StockTodayPriceId();
+        id.setId(entity.getId());
+        id.setTime(entity.getLastTradeDate());
+
+        tpe.setId(id);
+        tpe.setLastPrice(entity.getLastPrice());
+        tpe.setLastTradeCount(Integer.parseInt(entity.getLastTradeCount()));
+        tpe.setTotalTradeCount(Integer.parseInt(entity.getTotalTradeCount()));
+
+        return tpe;
     }
 }

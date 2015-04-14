@@ -13,10 +13,11 @@ public class SubscribeStockEntity implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "order_seq")
     private Integer order;
 
-    @ManyToOne(targetEntity = SubscribeGroupEntity.class)
+    @ManyToOne
+    @JoinColumn(name = "group_id",referencedColumnName = "id")
     private SubscribeGroupEntity group;
 
     @OneToOne(targetEntity = StockEntity.class)

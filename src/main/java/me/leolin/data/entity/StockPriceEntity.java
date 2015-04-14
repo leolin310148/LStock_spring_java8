@@ -180,4 +180,5 @@ public class StockPriceEntity implements Serializable {
     public void setYesterdayPrice(String yesterdayPrice) {
         this.yesterdayPrice = yesterdayPrice;
     }
+
 }

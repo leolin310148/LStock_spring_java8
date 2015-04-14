@@ -5,16 +5,12 @@ import me.leolin.Config;
 import me.leolin.business.transformer.StockTransformer;
 import me.leolin.dao.OtcIndustryDao;
 import me.leolin.dao.StockDao;
-import me.leolin.dao.StockPriceDao;
 import me.leolin.dao.TseIndustryDao;
 import me.leolin.data.dto.stock.IndustryDto;
 import me.leolin.data.dto.stock.StockDto;
-import me.leolin.data.dto.stock.StockPriceDto;
 import me.leolin.data.entity.OtcIndustryEntity;
 import me.leolin.data.entity.StockEntity;
-import me.leolin.data.entity.StockPriceEntity;
 import me.leolin.data.entity.TseIndustryEntity;
-import me.leolin.data.holder.stock.RemoteStockPriceHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +20,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import rx.util.async.Async;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
-import static rx.schedulers.Schedulers.io;
 
 /**
  * @author leolin
@@ -61,9 +54,6 @@ public class StockService {
     private OtcIndustryDao otcIndustryDao;
     @Autowired
     private StockDao stockDao;
-    @Autowired
-    private StockPriceDao stockPriceDao;
-
 
     private void syncStocksInIndustry(String marketCode, String industryCode) {
         try {
@@ -160,76 +150,8 @@ public class StockService {
         }
     }
 
-    @Scheduled(cron = "0/5 0/1 9-13 * * ?")
-//    @Scheduled(cron = "0/5 0-35/1 13 ? * MON-FRI")
-//    @Scheduled(fixedRate = 60000, initialDelay = 5000)
-    public void syncStockPrice() {
-        LOGGER.debug("Start get price");
-        tseIndustryDao.getAllIndustryCodes().forEach(code -> {
-                    String queryString = String.join
-                            ("|", (
-                                    stockDao.findByMarketAndIndustry(KEY_TSE, code)
-                                            .stream()
-                                            .map(e -> KEY_TSE + "_" + e.getId())
-                                            .collect(toList())
-                            ));
-                    if (!queryString.isEmpty()) {
-                        Async.start(() -> getRemoteStockPrice(queryString), io())
-                                .subscribe(stockPriceDao::save);
-                    }
-                }
-        );
-        otcIndustryDao.getAllIndustryCodes().forEach(code -> {
-                    String queryString = String.join(
-                            "|", (
-                                    stockDao.findByMarketAndIndustry(KEY_OTC, code)
-                                            .stream()
-                                            .map(e -> KEY_OTC + "_" + e.getId())
-                                            .collect(toList())
-                            ));
-                    if (!queryString.isEmpty()) {
-                        Async.start(() -> getRemoteStockPrice(queryString), io())
-                                .subscribe(stockPriceEntities -> {
-                                    stockPriceDao.save(stockPriceEntities);
-                                    LOGGER.debug("Successfully save {} price entities", stockPriceEntities.size());
-                                });
-                    }
-                }
-        );
-    }
 
 
-    private List<StockPriceEntity> getRemoteStockPrice(String queryString) {
-        String url = String.format(Config.URL_GET_STOCK_PIRCE, queryString);
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-        try {
-            RemoteStockPriceHolder holder = objectMapper.readValue(responseEntity.getBody(), RemoteStockPriceHolder.class);
-            List<StockPriceEntity> prices = holder.getStockPrices();
-            LOGGER.debug("Successfully get {} stock price", prices.size());
-            return prices;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return new ArrayList<>(0);
-        }
-    }
 
-    public List<StockPriceDto> getStockPriceInfos(List<String> stockIds) {
-        return stockPriceDao
-                .findAll(
-                        stockIds.stream()
-                                .map(this::checkStockId)
-                                .collect(toList())
-                )
-                .stream()
-                .map(StockTransformer::priceEntityToDto)
-                .collect(toList());
-    }
-
-    private String checkStockId(String id) {
-        if (!id.contains(".tw")) {
-            return id + ".tw";
-        }
-        return id;
-    }
 
 }

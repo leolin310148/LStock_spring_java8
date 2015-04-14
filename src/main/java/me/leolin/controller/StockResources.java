@@ -1,5 +1,6 @@
 package me.leolin.controller;
 
+import me.leolin.business.service.StockPriceService;
 import me.leolin.business.service.StockService;
 import me.leolin.data.holder.common.DefaultResultHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,12 @@ public class StockResources {
 
     @Autowired
     private StockService stockService;
+    @Autowired
+    private StockPriceService stockPriceService;
 
     @RequestMapping(value = "/price", method = RequestMethod.POST)
     public DefaultResultHolder getStockPrice(@RequestBody List<String> stockIds) {
-        return new DefaultResultHolder(stockService.getStockPriceInfos(stockIds));
+        return new DefaultResultHolder(stockPriceService.getStockPriceInfos(stockIds));
     }
 
     @RequestMapping(value = "/stock/{marketCode}/{industryCode}", method = RequestMethod.GET)
