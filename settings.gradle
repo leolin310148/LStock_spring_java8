@@ -1,2 +1,4 @@
-rootProject.name = 'LStock2015'
+rootProject.name = 'Simple-Taiwan-Stock-Server'
+include 'Server'
+include 'DataClient'
 
